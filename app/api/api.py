@@ -1,6 +1,12 @@
 import json
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
+import reverse_geocoder as rg
+
+import reverse_geocode
+
+
+
 
 def point_polygon(latitud,longitud,stringJson):
     bordes = abstraer(stringJson)       #saneamos desde la BD de MP
@@ -21,4 +27,17 @@ def abstraer(stringJson):
         t = tuple(e for e in pol)       #convertimos a tuplas
         polygon_saneado.append(t)       #agregamos al array
 
-    return polygon_saneado
+    return polygon_sanead
+
+def buscar(latitud,longitud):
+    coordinates =[(latitud, longitud)]
+    #result = rg.search(coordinates)
+    #coordinates = (latitud, longitud), (31.76, 35.21)
+    #print(coordinates)
+    result = reverse_geocode.search(coordinates)
+    return result
+
+def buscar2(latitud,longitud):
+    coordinates =[(latitud, longitud)]
+    result = rg.search(coordinates)
+    return result

@@ -9,13 +9,16 @@ class Item(BaseModel):
     longitud: float = -65.088969087838
     json_borde: Optional['str'] ='[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","id":"cochabamba","coordinates":[[[-66.785232,-18.135654],[-66.676444,-18.109284],[-66.785232,-18.135654]] ] }}]'
 
+class Punto(BaseModel):
+    latitud: float = -19.891017337524648
+    longitud: float = -65.088969087838
+
 
 app = FastAPI(
     title='SkyGIS',
     description='Microservicio para trabajar confirmación geografica',
     version="0.0.1",   
 )
-
 
 @app.get("/")
 def home():
@@ -42,6 +45,22 @@ async def verificar(item: Item):
                 "latitud":item.latitud,
                 "longitud":item.longitud,
                 "pertenece": api.point_polygon(item.latitud,item.longitud,item.json_borde)
+            },
+            "status"  : 200
+    }
+    return res    
+
+
+@app.post("/punto-en-mundo", status_code=200)
+async def buscar(punto: Punto):
+    res = {
+            "error"   : False,
+            "message" : "Ubicación de un punto en el mundo",
+            "response": {
+                "latitud":punto.latitud,
+                "longitud":punto.longitud,
+                "ubicacion": api.buscar(punto.latitud,punto.longitud),
+                "ubicacion2": api.buscar2(punto.latitud,punto.longitud)
             },
             "status"  : 200
     }
