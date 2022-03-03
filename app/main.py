@@ -1,15 +1,13 @@
-from array import array
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from datetime import datetime
-#from starlette.responses import Response
 from typing import Optional
 from pydantic import BaseModel
 from app.api import api
 
 class Item(BaseModel):
-    point: str='-19.891017337524648, -65.088969087838'
-    polygon: Optional['str'] ='[[-65.249813,-21.482379],[-65.2118,-21.29097],[-65.222802,-21.253301]]'
-
+    latitud: float = -19.891017337524648
+    longitud: float = -65.088969087838
+    json_borde: Optional['str'] ='[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","id":"cochabamba","coordinates":[[[-66.785232,-18.135654],[-66.676444,-18.109284],[-66.785232,-18.135654]] ] }}]'
 
 
 app = FastAPI(
@@ -20,7 +18,7 @@ app = FastAPI(
 
 
 @app.get("/")
-def root():
+def home():
     home = {
             "error"   : False,
             "message" : "ok",
@@ -35,6 +33,16 @@ def root():
     }
     return home
 
-@app.post("/boolean-point-in-polygon")
-async def point_polygon(item: Item):
-    return api.point_polygon(item)
+@app.post("/punto-en-area", status_code=200)
+async def verificar(item: Item):
+    res = {
+            "error"   : False,
+            "message" : "Punto geográfico pertenece a una área determinada?",
+            "response": {
+                "latitud":item.latitud,
+                "longitud":item.longitud,
+                "pertenece": api.point_polygon(item.latitud,item.longitud,item.json_borde)
+            },
+            "status"  : 200
+    }
+    return res    

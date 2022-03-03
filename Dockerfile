@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.8.1-alpine
+FROM python:3.6.12
 
 # set work directory
 WORKDIR /src
@@ -8,16 +8,18 @@ WORKDIR /src
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+
 # copy requirements file
 COPY ./requirements.txt /src/requirements.txt
+RUN apt update
+RUN python3 -m pip install --upgrade pip
 
-# install dependencies
-RUN set -eux \
-    && apk add --no-cache --virtual .build-deps build-base \
-    libressl-dev libffi-dev gcc musl-dev python3-dev \
-    && pip install --upgrade pip setuptools wheel \
-    && pip install -r /src/requirements.txt \
-    && rm -rf /root/.cache/pip
+RUN python3 -m pip install shapely
+
+
+RUN python3 -m pip install --upgrade pip setuptools wheel
+RUN python3 -m pip install -r /src/requirements.txt
+
 
 # copy project
 COPY . /src/
