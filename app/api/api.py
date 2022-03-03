@@ -3,10 +3,10 @@ from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
 def point_polygon(latitud,longitud,stringJson):
-    bordes = abstraer(stringJson)
-    point = Point(latitud, longitud)
-    polygon = Polygon(bordes)
-    resultado = polygon.contains(point)
+    bordes = abstraer(stringJson)       #saneamos desde la BD de MP
+    point = Point(latitud, longitud)    #Covertimos en un punto las coordenadas del punto
+    polygon = Polygon(bordes)           #Convertimos en poligono
+    resultado = polygon.contains(point)  #libreria que verifica si un punto pertenece a una area
     return resultado
 
 
