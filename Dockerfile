@@ -1,5 +1,6 @@
 # pull official base image
-FROM python:3.6.12
+#FROM python:3.6.12
+FROM python:3.8.10
 
 # set work directory
 WORKDIR /src
