@@ -5,13 +5,14 @@ from pydantic import BaseModel
 from app.api import api
 
 class Item(BaseModel):
-    latitud: float = -19.891017337524648
-    longitud: float = -65.088969087838
-    json_borde: Optional['str'] ='[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","id":"cochabamba","coordinates":[[[-66.785232,-18.135654],[-66.676444,-18.109284],[-66.785232,-18.135654]] ] }}]'
+    latitud: float = -19.033843983071566
+    longitud: float = -65.2579481489859
+    json_borde: Optional['str'] ='[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","id":"cochabamba","coordinates":[[[ -65.25818020105362,-19.033169241181586 ],[-65.25822848081589,-19.034094722562475],[-65.25756865739822,-19.034115007028145],[-65.25752305984497,-19.033184454615835],[-65.25818020105362,-19.033169241181586]] ] }}]'
+
 
 class Punto(BaseModel):
-    latitud: float = -19.891017337524648
-    longitud: float = -65.088969087838
+    latitud: float = 25.761095379325667
+    longitud: float = -80.19431586662844
 
 
 app = FastAPI(
@@ -36,7 +37,7 @@ def home():
     }
     return home
 
-@app.post("/punto-en-area", status_code=200)
+@app.post("/punto-en-area", status_code=200,  tags=["Geolocalización"])
 async def verificar(item: Item):
     res = {
             "error"   : False,
@@ -51,7 +52,7 @@ async def verificar(item: Item):
     return res    
 
 
-@app.post("/punto-en-mundo", status_code=200)
+@app.post("/punto-en-mundo", status_code=200, tags=["Geolocalización"])
 async def buscar(punto: Punto):
     res = {
             "error"   : False,
@@ -60,7 +61,6 @@ async def buscar(punto: Punto):
                 "latitud":punto.latitud,
                 "longitud":punto.longitud,
                 "ubicacion": api.buscar(punto.latitud,punto.longitud),
-                "ubicacion2": api.buscar2(punto.latitud,punto.longitud)
             },
             "status"  : 200
     }
