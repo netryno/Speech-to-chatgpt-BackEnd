@@ -1,8 +1,6 @@
 import json
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
-import reverse_geocoder as rg
-
 import reverse_geocode
 
 
@@ -14,7 +12,7 @@ def point_polygon(latitud,longitud,stringJson):
     polygon = Polygon(bordes)           #Convertimos en poligono
     resultado = polygon.contains(point)  #libreria que verifica si un punto pertenece a una area
     return resultado
-
+    #retorna falso verdadero
 
 def abstraer(stringJson):
     x = json.loads(stringJson)
@@ -27,17 +25,16 @@ def abstraer(stringJson):
         t = tuple(e for e in pol)       #convertimos a tuplas
         polygon_saneado.append(t)       #agregamos al array
 
-    return polygon_sanead
+    return polygon_saneado
 
 def buscar(latitud,longitud):
-    coordinates =[(latitud, longitud)]
-    #result = rg.search(coordinates)
-    #coordinates = (latitud, longitud), (31.76, 35.21)
-    #print(coordinates)
-    result = reverse_geocode.search(coordinates)
+    coordinates =[(latitud, longitud)]      #armamos tupla
+    result = reverse_geocode.search(coordinates) #aplicamos a libreria
     return result
-
-def buscar2(latitud,longitud):
-    coordinates =[(latitud, longitud)]
-    result = rg.search(coordinates)
-    return result
+    '''
+    {
+        "country_code": "BO",
+        "city": "Betanzos",
+        "country": "Bolivia"
+    }
+    '''
