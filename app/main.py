@@ -22,8 +22,8 @@ class Area(BaseModel):
 
 
 app = FastAPI(
-    title='SkyGIS',
-    description='Microservicio para trabajar confirmación geografica',
+    title='SkyGIS - Ministerio Público',
+    description='Microservicio para trabajar con confirmación geografica',
     version="0.0.1",   
 )
 
@@ -77,7 +77,7 @@ async def buscar(punto: Punto):
 async def area(area:Area):
     res = {
             "error"   : False,
-            "message" : "Renderizar area",
+            "message" : "Area renderizado en un imagen png",
             "response": {
                 "png_base64": api.plotear(area.json_borde),
             },
