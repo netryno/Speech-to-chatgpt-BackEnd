@@ -4,15 +4,21 @@ from typing import Optional
 from pydantic import BaseModel
 from app.api import api
 
+area_default= '[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","id":"cochabamba","coordinates":[[[ -65.25818020105362,-19.033169241181586 ],[-65.25822848081589,-19.034094722562475],[-65.25756865739822,-19.034115007028145],[-65.25752305984497,-19.033184454615835],[-65.25818020105362,-19.033169241181586]] ] }}]'
+
 class Item(BaseModel):
     latitud: float = -19.033843983071566
     longitud: float = -65.2579481489859
-    json_borde: Optional['str'] ='[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","id":"cochabamba","coordinates":[[[ -65.25818020105362,-19.033169241181586 ],[-65.25822848081589,-19.034094722562475],[-65.25756865739822,-19.034115007028145],[-65.25752305984497,-19.033184454615835],[-65.25818020105362,-19.033169241181586]] ] }}]'
+    json_borde: Optional['str'] =area_default
 
 
 class Punto(BaseModel):
     latitud: float = 25.761095379325667
     longitud: float = -80.19431586662844
+
+class Area(BaseModel):
+    json_borde: Optional['str'] =area_default
+
 
 
 app = FastAPI(
@@ -65,3 +71,16 @@ async def buscar(punto: Punto):
             "status"  : 200
     }
     return res    
+
+
+@app.post("/plotear", status_code=200, tags=["Geolocalización"])
+async def area(area:Area):
+    res = {
+            "error"   : False,
+            "message" : "Renderizar area",
+            "response": {
+                "png_base64": api.plotear(area.json_borde),
+            },
+            "status"  : 200
+    }
+    return res  
