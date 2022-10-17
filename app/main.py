@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from app.api import api
 
 area_default= '[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","id":"cochabamba","coordinates":[[[ -65.25818020105362,-19.033169241181586 ],[-65.25822848081589,-19.034094722562475],[-65.25756865739822,-19.034115007028145],[-65.25752305984497,-19.033184454615835],[-65.25818020105362,-19.033169241181586]] ] }}]'
+area_default2= '[[[-65.2580326795578,-19.046039308364062],[-65.25892317295…04707880924646],[-65.2580326795578,-19.046039308364062]]]'
 
 class Item(BaseModel):
     latitud: float = -19.033843983071566
@@ -19,6 +20,11 @@ class Punto(BaseModel):
 class Area(BaseModel):
     json_borde: Optional['str'] =area_default
 
+
+class Item2(BaseModel):
+    latitud: float = -19.033843983071566
+    longitud: float = -65.2579481489859
+    json_borde: Optional['str'] =area_default2
 
 
 app = FastAPI(
@@ -52,6 +58,20 @@ async def verificar(item: Item):
                 "latitud":item.latitud,
                 "longitud":item.longitud,
                 "pertenece": api.point_polygon(item.latitud,item.longitud,item.json_borde)
+            },
+            "status"  : 200
+    }
+    return res  
+
+@app.post("/punto-en-area2", status_code=200,  tags=["Geolocalización"])
+async def verificar(item2: Item2):
+    res = {
+            "error"   : False,
+            "message" : "Punto geográfico pertenece a una área determinada (coordinates)?",
+            "response": {
+                "latitud":item2.latitud,
+                "longitud":item2.longitud,
+                "pertenece": api.point_polygon2(item2.latitud,item2.longitud,item2.json_borde)
             },
             "status"  : 200
     }

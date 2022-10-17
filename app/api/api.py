@@ -36,6 +36,32 @@ def abstraer(stringJson,revertir=1):
 
     return polygon_saneado
 
+def point_polygon2(latitud,longitud,stringJson):
+    bordes = abstraer2(stringJson,1)       #saneamos desde la BD de MP
+    point = Point(latitud, longitud)    #Covertimos en un punto las coordenadas del punto
+    polygon = Polygon(bordes)           #Convertimos en poligono
+    resultado = polygon.contains(point)  #libreria que verifica si un punto pertenece a una area
+    return resultado
+    #retorna falso verdadero
+
+def abstraer2(stringJson,revertir=1):
+    x = json.loads(stringJson)
+    #obtenemos lo que nos interesa
+    #T ODO validar / u obtener de diferentes formatos
+    poligono = x
+    polygon_saneado = []
+    for val in poligono:                #iteramos array
+        if(revertir==1):
+            pol = val[::-1]                 #revertimos
+            t = tuple(e for e in pol)       #convertimos a tuplas
+        else:
+            t = tuple(e for e in val)
+        polygon_saneado.append(t)       #agregamos al array
+
+    return polygon_saneado
+
+
+
 def buscar(latitud,longitud):
     coordinates =[(latitud, longitud)]      #armamos tupla
     result = reverse_geocode.search(coordinates) #aplicamos a libreria
