@@ -28,7 +28,7 @@ class Area(BaseModel):
 class Item2(BaseModel):
     latitud: float = -19.033843983071566
     longitud: float = -65.2579481489859
-    json_borde: List[Punto] = cordinates
+    json_borde:List[] # List[Punto] = cordinates
 
 
 app = FastAPI(

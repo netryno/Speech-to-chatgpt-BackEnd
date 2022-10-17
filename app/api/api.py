@@ -45,7 +45,7 @@ def point_polygon2(latitud,longitud,stringJson):
     #retorna falso verdadero
 
 def abstraer2(stringJson,revertir=1):
-    x = json.loads(stringJson)
+    #x = json.loads(stringJson)
     #obtenemos lo que nos interesa
     #T ODO validar / u obtener de diferentes formatos
     poligono = stringJson #x
