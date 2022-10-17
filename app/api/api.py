@@ -48,7 +48,7 @@ def abstraer2(stringJson,revertir=1):
     x = json.loads(stringJson)
     #obtenemos lo que nos interesa
     #T ODO validar / u obtener de diferentes formatos
-    poligono = x
+    poligono = stringJson #x
     polygon_saneado = []
     for val in poligono:                #iteramos array
         if(revertir==1):
