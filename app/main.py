@@ -30,7 +30,7 @@ class Point(BaseModel):
 class Item2(BaseModel):
     latitud: float = -19.033843983071566
     longitud: float = -65.2579481489859
-    json_borde: List[Point] = cordinates
+    json_borde: cordinates
 
 
 app = FastAPI(
