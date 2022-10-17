@@ -23,9 +23,6 @@ class Punto(BaseModel):
 class Area(BaseModel):
     json_borde: Optional['str'] =area_default
 
-class Point(BaseModel):
-     point: List[25.761095379325667,-80.19431586662844]
-
 
 class Item2(BaseModel):
     latitud: float = -19.033843983071566
