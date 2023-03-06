@@ -1,109 +1,142 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
-from typing import Optional
+import io
+import os
 from pydantic import BaseModel
-from app.api import api
-import array
 from typing import List
+import requests
+import base64
+import speech_recognition as sr
+import pyttsx3
+import random
+import string
+import whisper
+import time
 
-area_default= '[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","id":"cochabamba","coordinates":[[[ -65.25818020105362,-19.033169241181586 ],[-65.25822848081589,-19.034094722562475],[-65.25756865739822,-19.034115007028145],[-65.25752305984497,-19.033184454615835],[-65.25818020105362,-19.033169241181586]] ] }}]'
-area_default2= '[[[-65.2580326795578,-19.046039308364062],[-65.25892317295…04707880924646],[-65.2580326795578,-19.046039308364062]]]'
-cordinates =  [[-65.2580326795578,-19.046039308364062],[-65.25892317295074,-19.04696725336608],[-65.25743186473846,-19.048087879484772],[-65.25656819343567,-19.04707880924646],[-65.2580326795578,-19.046039308364062]]
-
-class Item(BaseModel):
-    latitud: float = -19.033843983071566
-    longitud: float = -65.2579481489859
-    json_borde: Optional['str'] =area_default
-
-
-class Punto(BaseModel):
-    latitud: float = 25.761095379325667
-    longitud: float = -80.19431586662844
-
-class Area(BaseModel):
-    json_borde: Optional['str'] =area_default
-
-
-class Item2(BaseModel):
-    latitud: float = -19.033843983071566
-    longitud: float = -65.2579481489859
-    json_borde: List[List[float]] = cordinates
-
+#envs
+token_openai = os.getenv("OPENAI_TOKEN")
+openai_temperature = os.getenv("OPENAI_TEMPERATURE",0.7)
+openai_max_tokens = os.getenv("OPENAI_MAX_TOKENS",50)
+whisper_model = os.getenv("WHISPER_MODEL",'tiny')
+front_url_cors = os.getenv("FRONT_URL_CORS",'https://localhost:8084')
 
 app = FastAPI(
-    title='SkyGIS - Ministerio Público',
-    description='Microservicio para trabajar con confirmación geografica',
+    title='SkyChatGPT',
+    description='Microservicio bot-chatgpt',
     version="0.0.1",   
 )
 
+print(front_url_cors)
+
+#cors
+origins = [
+    front_url_cors,
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class AudioFile(BaseModel):
+    audio_b64: str
+
 @app.get("/")
-def home():
+async def home():
     home = {
             "error"   : False,
-            "message" : "ok",
+            "message" : "SkyChatGPT",
             "response": {
-                "microservicio":"SkyGis",
+                "microservicio":"SkyChatGPT",
                 "version"       : "0.0.1",
                 "dateTime": (datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
-                "descripcion":"Información geográfica",
-                "autor": "Copyright © Ministerio Público",
+                "descripcion": f'SkyChatGPT: ',
+                "autor": "Copyright © Paul Caihuara",
             },
             "status"  : 200
     }
     return home
 
-@app.post("/punto-en-area", status_code=200,  tags=["Geolocalización"])
-async def verificar(item: Item):
-    res = {
-            "error"   : False,
-            "message" : "Punto geográfico pertenece a una área determinada?",
-            "response": {
-                "latitud":item.latitud,
-                "longitud":item.longitud,
-                "pertenece": api.point_polygon(item.latitud,item.longitud,item.json_borde)
-            },
-            "status"  : 200
+#Servicio
+@app.post("/process_audio/", status_code=200,  tags=["Boot"])
+async def convert_audio_to_text(audio: AudioFile):
+    texto = audiob64_a_texto(audio.audio_b64)
+    print('Pregunta: '+texto)
+    respuesta_txt=chatgpt(texto)
+    print('Respuesta:  '+respuesta_txt)
+    return {
+        "prompt": texto,
+        "chatgpt_respuesta":respuesta_txt,
+        "chatgpt_respuesta_audiob64": texto_a_audio(respuesta_txt)
     }
-    return res  
 
-@app.post("/punto-en-area2", status_code=200,  tags=["Geolocalización"])
-async def verificar(item2: Item2):
-    res = {
-            "error"   : False,
-            "message" : "Punto geográfico pertenece a una área determinada (coordinates)?",
-            "response": {
-                "latitud":item2.latitud,
-                "longitud":item2.longitud,
-                "pertenece": api.point_polygon2(item2.latitud,item2.longitud,item2.json_borde)
-            },
-            "status"  : 200
+#Funciones necesarias
+def chatgpt(prompt):
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer "+token_openai
     }
-    return res    
+    data = {
+        "model": "text-davinci-002",
+        "prompt": prompt,
+        "temperature": float(openai_temperature),
+        "max_tokens": int(openai_max_tokens)
+    }  
+    response = requests.post("https://api.openai.com/v1/completions", headers=headers, json=data)
+    print(response)
+    response_text = response.json()["choices"][0]["text"]
+
+    return response_text
+
+def audiob64_a_texto(audiob64):
+    path = './tmp/'+ strRandom(15) + '.wav'
+    # Crear un objeto de archivo a partir de la cadena de texto Base64
+    audio_file = io.BytesIO(base64.b64decode(audiob64))
+
+    with open(path, 'wb') as f:
+       f.write(audio_file.getbuffer())
+
+    model = whisper.load_model(whisper_model)
+
+    # load audio and pad/trim it to fit 30 seconds
+    audio = whisper.load_audio(path) ##  "hola.mp3"
+    audio = whisper.pad_or_trim(audio)
+
+    # make log-Mel spectrogram and move to the same device as the model
+    mel = whisper.log_mel_spectrogram(audio).to(model.device)
+
+    # detect the spoken language
+    _, probs = model.detect_language(mel)
+    print(f"Detected language: {max(probs, key=probs.get)}")
+    # decode the audio
+    #options = whisper.DecodingOptions()
+    options = whisper.DecodingOptions(fp16 = False)
+    result = whisper.decode(model, mel, options)
+    os.remove(path)
+    return result.text
+
+def texto_a_audio(texto):
+    path = './tmp/'+ strRandom(10) + '.mp3'
+    engine = pyttsx3.init()
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[1].id)
+    engine.save_to_file(texto, path)
+    engine.runAndWait()
+    time.sleep(2)
+    with io.open(path, 'rb') as f:
+        audio_bytes = f.read()
+
+    base64_audio = base64.b64encode(audio_bytes).decode('utf-8')
+    os.remove(path)
+    return base64_audio
 
 
-@app.post("/punto-en-mundo", status_code=200, tags=["Geolocalización"])
-async def buscar(punto: Punto):
-    res = {
-            "error"   : False,
-            "message" : "Ubicación de un punto en el mundo",
-            "response": {
-                "latitud":punto.latitud,
-                "longitud":punto.longitud,
-                "ubicacion": api.buscar(punto.latitud,punto.longitud),
-            },
-            "status"  : 200
-    }
-    return res    
-
-
-@app.post("/plotear", status_code=200, tags=["Geolocalización"])
-async def area(area:Area):
-    res = {
-            "error"   : False,
-            "message" : "Area renderizado en un imagen png",
-            "response": {
-                "png_base64": api.plotear(area.json_borde),
-            },
-            "status"  : 200
-    }
-    return res  
+def strRandom(longitud = 8):
+    caracteres = string.ascii_lowercase + string.digits # Caracteres alfanuméricos en minúscula
+    resultado = ''.join(random.choice(caracteres) for i in range(longitud)) # Generar string aleatorio
+    return resultado

@@ -1,13 +1,17 @@
 version: "3.7"
 
 services:
-  skygis:
+  skychatgpt:
     build: .
-    container_name: skygis
+    container_name: skychatgpt
     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     volumes:
       - ./:/src/
     ports:
-      - 8002:8000
+      - 8003:8000
     environment:
-      - DATABASE_URL=postgresql://fastapi:fastapi@db/fastapi
+      - OPENAI_TOKEN=YOURTOKEN-FOR-https://api.openai.com/v1/completions
+      - OPENAI_TEMPERATURE=0.5
+      - OPENAI_MAX_TOKENS=100
+      - FRONT_URL_CORS=https://localhost:8084/
+      - WHISPER_MODEL=tiny
