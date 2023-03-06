@@ -1,10 +1,10 @@
 ## MICROSERVICE
 ChatGPT + OpenAI Whisper (audio a texto) + Pyttsx3 (texto a audio) => Docker-compose
 
--Servicio recibe un archivo audio en base64, (audio con consulta verbal a chatgpt).
--Convierte el audio en texto usando herramienta: openai-whisper.
--Consume servicio de api.openai.com/v1/completions, pasandole el prompt extraido del audio.
--Convierte el texto (respuesta) de chatgpt en audio (mp3), y retorna como respuesta en base64
+-Servicio recibe un archivo audio en base64, (audio con consulta verbal a chatgpt).<br>
+-Convierte el audio en texto usando herramienta: openai-whisper.<br>
+-Consume servicio de api.openai.com/v1/completions, pasandole el prompt extraido del audio.<br>
+-Convierte el texto (respuesta) de chatgpt en audio (mp3), y retorna como respuesta en base64<br>
 
 
 
@@ -16,7 +16,7 @@ ChatGPT + OpenAI Whisper (audio a texto) + Pyttsx3 (texto a audio) => Docker-com
 ## Clonar proyecto
 
 ```
-git clone https://git.....
+git clone https://github.com/netryno/microservice-chatgpt.git
 ```
 Copiar docker-compose.example.yml
 Configurar los variables de entorno
