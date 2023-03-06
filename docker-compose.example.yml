@@ -13,5 +13,5 @@ services:
       - OPENAI_TOKEN=YOURTOKEN-FOR-https://api.openai.com/v1/completions
       - OPENAI_TEMPERATURE=0.5
       - OPENAI_MAX_TOKENS=100
-      - FRONT_URL_CORS=https://localhost:8084/
+      - FRONT_URL_CORS=https://localhost:8084
       - WHISPER_MODEL=tiny
