@@ -1,4 +1,5 @@
-## MICROSERVICE
+## Speech to chatgpt (BackEnd)
+
 ChatGPT + OpenAI Whisper (audio a texto) + Pyttsx3 (texto a audio) => Docker-compose
 
 -Servicio recibe un archivo audio en base64, (audio con consulta verbal a chatgpt).<br>
@@ -16,7 +17,7 @@ ChatGPT + OpenAI Whisper (audio a texto) + Pyttsx3 (texto a audio) => Docker-com
 ## Clonar proyecto
 
 ```
-git clone https://github.com/netryno/microservice-chatgpt-backend.git
+git clone https://github.com/netryno/Speech-to-chatgpt-BackEnd.git
 ```
 Copiar docker-compose.example.yml
 Configurar los variables de entorno
@@ -86,5 +87,5 @@ openai-whisper
 ### FrontEnd para este servicio
 Para probar el servicio, instalar el proyecto frontEnd:
 
-https://github.com/netryno/Speech-to-chatgpt.git
+https://github.com/netryno/Speech-to-chatgpt-frontEnd
 
