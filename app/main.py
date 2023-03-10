@@ -81,6 +81,8 @@ def chatgpt(prompt):
         "Content-Type": "application/json",
         "Authorization": "Bearer "+token_openai
     }
+
+    #models: es-davinci, text-davinci-002
     data = {
         "model": "text-davinci-002",
         "prompt": prompt,

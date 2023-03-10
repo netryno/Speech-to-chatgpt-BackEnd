@@ -75,13 +75,13 @@ content-type: application/json
 
 
 ## Librerias:
-fastapi
-uvicorn
-pydantic
-requests
-SpeechRecognition
-pyttsx3
-openai-whisper
+fastapi<br>
+uvicorn<br>
+pydantic<br>
+requests<br>
+SpeechRecognition<br>
+pyttsx3<br>
+openai-whisper<br>
 
 
 ### FrontEnd para este servicio
