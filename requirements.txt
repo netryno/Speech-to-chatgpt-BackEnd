@@ -4,3 +4,4 @@ pydantic
 requests
 SpeechRecognition
 pyttsx3
+gTTS==2.2.3

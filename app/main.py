@@ -14,6 +14,8 @@ import string
 import whisper
 import time
 
+from gtts import gTTS
+
 #envs
 token_openai = os.getenv("OPENAI_TOKEN")
 openai_temperature = os.getenv("OPENAI_TEMPERATURE",0.7)
@@ -45,35 +47,6 @@ app.add_middleware(
 
 class AudioFile(BaseModel):
     audio_b64: str
-
-@app.get("/")
-async def home():
-    home = {
-            "error"   : False,
-            "message" : "SkyChatGPT",
-            "response": {
-                "microservicio":"SkyChatGPT",
-                "version"       : "0.0.1",
-                "dateTime": (datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
-                "descripcion": f'SkyChatGPT: ',
-                "autor": "Copyright © Paul Caihuara",
-            },
-            "status"  : 200
-    }
-    return home
-
-#Servicio
-@app.post("/process_audio/", status_code=200,  tags=["Boot"])
-async def convert_audio_to_text(audio: AudioFile):
-    texto = audiob64_a_texto(audio.audio_b64)
-    print('Pregunta: '+texto)
-    respuesta_txt=chatgpt(texto)
-    print('Respuesta:  '+respuesta_txt)
-    return {
-        "prompt": texto,
-        "chatgpt_respuesta":respuesta_txt,
-        "chatgpt_respuesta_audiob64": texto_a_audio(respuesta_txt)
-    }
 
 #Funciones necesarias
 def chatgpt(prompt):
@@ -122,7 +95,7 @@ def audiob64_a_texto(audiob64):
     os.remove(path)
     return result.text
 
-def texto_a_audio(texto):
+def texto_a_audio2(texto):
     path = './tmp/'+ strRandom(10) + '.mp3'
     engine = pyttsx3.init()
     voices = engine.getProperty('voices')
@@ -137,8 +110,60 @@ def texto_a_audio(texto):
     os.remove(path)
     return base64_audio
 
+def texto_a_audio(texto):
+    path = './tmp/'+ strRandom(10) + '.mp3'
+    tts = gTTS(texto, lang='es', slow=False) # La velocidad es rápida
+    tts.save(path)
+
+    time.sleep(2)
+    with io.open(path, 'rb') as f:
+        audio_bytes = f.read()
+    base64_audio = base64.b64encode(audio_bytes).decode('utf-8')
+    os.remove(path)
+    return base64_audio
+
 
 def strRandom(longitud = 8):
     caracteres = string.ascii_lowercase + string.digits # Caracteres alfanuméricos en minúscula
     resultado = ''.join(random.choice(caracteres) for i in range(longitud)) # Generar string aleatorio
     return resultado
+
+
+
+@app.get("/")
+async def home():
+    home = {
+            "error"   : False,
+            "message" : "SkyChatGPT",
+            "response": {
+                "microservicio":"SkyChatGPT",
+                "version"       : "0.0.1",
+                "dateTime": (datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
+                "descripcion": f'SkyChatGPT: ',
+                "autor": "Copyright © Paul Caihuara",
+            },
+            "status"  : 200
+    }
+    return home
+
+#Servicio
+@app.post("/process_audio/", status_code=200,  tags=["Boot"])
+async def convert_audio_to_text(audio: AudioFile):
+    texto = audiob64_a_texto(audio.audio_b64)
+    print('Pregunta: '+texto)
+    respuesta_txt=chatgpt(texto)
+    print('Respuesta:  '+respuesta_txt)
+    return {
+        "prompt": texto,
+        "chatgpt_respuesta":respuesta_txt,
+        "chatgpt_respuesta_audiob64": texto_a_audio(respuesta_txt)
+    }
+
+
+#Servicio
+@app.post("/process_texto/", status_code=200,  tags=["Boot"])
+async def text():
+    path = './tmp/demo1.mp3'
+    text = "Hola, ¿cómo estás?"
+
+
