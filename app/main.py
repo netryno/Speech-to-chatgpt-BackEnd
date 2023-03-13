@@ -30,6 +30,7 @@ app = FastAPI(
 )
 
 print(front_url_cors)
+#https://localhost:8082,
 
 #cors
 origins = [
