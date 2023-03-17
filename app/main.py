@@ -25,7 +25,7 @@ front_url_cors = os.getenv("FRONT_URL_CORS",'https://localhost:8084')
 
 app = FastAPI(
     title='SkyChatGPT',
-    description='Microservicio bot-chatgpt',
+    description='Microservicio procesamiento audio',
     version="0.0.1",   
 )
 
@@ -47,9 +47,13 @@ app.add_middleware(
 
 
 class AudioFile(BaseModel):
-    audio_b64: str
+    audio_b64: str ="//NExAASKLF0AU9gAB..."
+ 
+class Texto(BaseModel):
+    texto: str = "Hola mundo"
 
 #Funciones necesarias
+#consulta a chatgpt
 def chatgpt(prompt):
     headers = {
         "Content-Type": "application/json",
@@ -66,7 +70,6 @@ def chatgpt(prompt):
     response = requests.post("https://api.openai.com/v1/completions", headers=headers, json=data)
     print(response)
     response_text = response.json()["choices"][0]["text"]
-
     return response_text
 
 def audiob64_a_texto(audiob64):
@@ -96,7 +99,7 @@ def audiob64_a_texto(audiob64):
     os.remove(path)
     return result.text
 
-def texto_a_audio2(texto):
+def texto_a_audio_pyttsx3(texto):
     path = './tmp/'+ strRandom(10) + '.mp3'
     engine = pyttsx3.init()
     voices = engine.getProperty('voices')
@@ -111,7 +114,7 @@ def texto_a_audio2(texto):
     os.remove(path)
     return base64_audio
 
-def texto_a_audio(texto):
+def texto_a_audio_gtts(texto):
     path = './tmp/'+ strRandom(10) + '.mp3'
     tts = gTTS(texto, lang='es', slow=False) # La velocidad es rápida
     tts.save(path)
@@ -135,12 +138,10 @@ def strRandom(longitud = 8):
 async def home():
     home = {
             "error"   : False,
-            "message" : "SkyChatGPT",
+            "message" : "microservicio SkyChatGPT",
             "response": {
-                "microservicio":"SkyChatGPT",
                 "version"       : "0.0.1",
                 "dateTime": (datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
-                "descripcion": f'SkyChatGPT: ',
                 "autor": "Copyright © Paul Caihuara",
             },
             "status"  : 200
@@ -149,7 +150,7 @@ async def home():
 
 #Servicio
 @app.post("/process_audio/", status_code=200,  tags=["Boot"])
-async def convert_audio_to_text(audio: AudioFile):
+async def consultar_a_chat_gpt(audio: AudioFile):
     texto = audiob64_a_texto(audio.audio_b64)
     print('Pregunta: '+texto)
     respuesta_txt=chatgpt(texto)
@@ -157,14 +158,34 @@ async def convert_audio_to_text(audio: AudioFile):
     return {
         "prompt": texto,
         "chatgpt_respuesta":respuesta_txt,
-        "chatgpt_respuesta_audiob64": texto_a_audio(respuesta_txt)
+        "chatgpt_respuesta_audiob64": texto_a_audio_gtts(respuesta_txt)
     }
 
 
-#Servicio
-@app.post("/process_texto/", status_code=200,  tags=["Boot"])
-async def text():
-    path = './tmp/demo1.mp3'
-    text = "Hola, ¿cómo estás?"
+@app.post("/audio_a_texto/", status_code=200,  tags=["Microservicio"])
+async def audio_a_texto(audio: AudioFile):
+        texto = audiob64_a_texto(audio.audio_b64)
+        return {
+                "error"   : False,
+                "message" : "mp3 a texto con Open AI ",
+                "response": {
+                    "texto": texto,
+                    "whisper_model"  : whisper_model,
+                },
+                "status"  : 200
+        }
+
+
+@app.post("/texto_a_audio/", status_code=200,  tags=["Microservicio"])
+async def textso_a_audio(texto: Texto):
+        return {
+                "error"   : False,
+                "message" : "Texto a audio",
+                "response": {
+                   "audiob64": texto_a_audio_gtts(texto.texto),
+                   "model": "gTTs (google)"
+                },
+                "status"  : 200
+        }
 
 
