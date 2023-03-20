@@ -187,4 +187,15 @@ async def textso_a_audio(texto: Texto):
                 "status"  : 200
         }
 
-
+@app.post("/texto_a_gpt/", status_code=200,  tags=["Microservicio"])
+async def texto_a_gpt(texto: Texto):
+        respuesta_txt=chatgpt(texto.texto)
+        return {
+                "error"   : False,
+                "message" : "Texto a gpt",
+                "response": {
+                   "gpt": respuesta_txt,
+                   "temperatura": openai_temperature
+                },
+                "status"  : 200
+        }
