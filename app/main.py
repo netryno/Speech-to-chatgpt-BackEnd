@@ -67,7 +67,7 @@ def chatgpt(prompt):
         "max_tokens": int(openai_max_tokens)
     }  
     response = requests.post("https://api.openai.com/v1/completions", headers=headers, json=data)
-    print(response)
+    print(response.json())
     response_text = response.json()["choices"][0]["text"]
     return response_text
 
