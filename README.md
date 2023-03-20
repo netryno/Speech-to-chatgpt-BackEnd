@@ -30,7 +30,7 @@ Configurar los variables de entorno
       - WHISPER_MODEL=tiny
 ```
 
-WHISPER_MODEL : tiny, base, small, medium, large, large-v2
+WHISPER_MODEL : <br>tiny, <br>base, <br>small, <br>medium, <br>large, <br>large-v2
 OPENAI_TEMPERATURE: valores de 0.0 a 1.0
 OPENAI_MAX_TOKENS: Cantidad de palabras maxima en la respuesta de chatgpt
 
