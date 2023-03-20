@@ -277,3 +277,6 @@ $RECYCLE.BIN/
 
 # End of https://www.gitignore.io/api/linux,macos,python,pycharm,windows,visualstudiocode
 docker-compose.yml
+
+tmp
+package-lock.json

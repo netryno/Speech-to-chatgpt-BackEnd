@@ -29,13 +29,12 @@ app = FastAPI(
     version="0.0.1",   
 )
 
-print(front_url_cors)
+#print(front_url_cors)
 #https://localhost:8082,
 
+
 #cors
-origins = [
-    front_url_cors,
-]
+origins = front_url_cors.split(",")
 
 app.add_middleware(
     CORSMiddleware,
