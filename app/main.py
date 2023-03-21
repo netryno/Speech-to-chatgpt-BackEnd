@@ -32,7 +32,6 @@ app = FastAPI(
 #print(front_url_cors)
 #https://localhost:8082,
 
-
 #cors
 origins = front_url_cors.split(",")
 
@@ -79,7 +78,9 @@ def audiob64_a_texto(audiob64):
     with open(path, 'wb') as f:
        f.write(audio_file.getbuffer())
 
-    model = whisper.load_model(whisper_model)
+    demol = './tmp/medium.pt'
+    #whisper_model
+    model = whisper.load_model(demol)
 
     # load audio and pad/trim it to fit 30 seconds
     audio = whisper.load_audio(path) ##  "hola.mp3"

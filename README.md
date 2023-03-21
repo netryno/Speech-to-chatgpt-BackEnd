@@ -89,3 +89,8 @@ Para probar el servicio, instalar el proyecto frontEnd:
 
 https://github.com/netryno/Speech-to-chatgpt-frontEnd
 
+
+##donwload models
+from
+https://github.com/openai/whisper/discussions/63
+and copy to /tmp
